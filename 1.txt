@@ -1,0 +1,45 @@
+Jag har valt att representera problemet som en graf. Grafen G = <V, E>, där |V| = n*n eftersom varje ruta i matrisen kommer representera ett hörn i grafen. Vi vet att från varje ruta i matrisen kan man gå till närliggande rutor, dvs. endast vertikalt eller horisontellt. Varje sådan gång kommer att representeras av en kant i E. Grafen är ej riktad, eftersom man teoretiskt sett kan gå fram och tillbaks mellan rutor i matrisen, även om det inte är särskilt smart. Varje hörn har en hörnkostnad som är den kostnad det tar att till hörnet från ett annat hörn.
+
+input till algoritmen: G = <V,E> , TL (lista med diken), s (hörnet som motsvarar M[0][0]), t (hörnet som motsvarar M[n][n]), en funktion weight(v) som returnerar ett heltal som är kostnaden för ett hörn.
+
+LabyrintPath(G, TL, s, t):
+	dist[s] = 0 // sätt avstånd från s till s = 0
+	for each v in V:
+		dist[v] := inf // sätt avstånd from s till v till infinity
+		previous[v] := nil // markerar vilken hörn man kom ifrån 
+		unvisited <- add v // lägger till v i listan med hörn vi ej besökt.
+	end for
+
+	while univisited is not empty:
+		u := vertex in unvisited, with lowest value in dist // 
+		
+		if dist[u] == inf
+			return impossible
+		end if
+
+		remove u from unvisited
+
+		for each neighbor v of u:
+			if (u,v) in TL:
+				if dist[u] < 1000:
+					cost := weight(v) + 100
+				else:
+					cost := inf
+				endif
+
+			else:
+				cost := weight(v)
+
+			endif
+
+			alt := dist[i] + cost
+			if alt < dist[v]:
+				dist[v] := alt
+				previous[v] := u
+			end if
+		end for
+	end while
+
+	return dist[t]
+
+tidskomplexiteten för detta enkla fall av dijkstras algoritm är O(|V|²), där |V| = n*n, dvs. O(n^4)
