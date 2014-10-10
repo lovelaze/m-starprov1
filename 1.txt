@@ -1,45 +1,114 @@
 Jag har valt att representera problemet som en graf. Grafen G = <V, E>, där |V| = n*n eftersom varje ruta i matrisen kommer representera ett hörn i grafen. Vi vet att från varje ruta i matrisen kan man gå till närliggande rutor, dvs. endast vertikalt eller horisontellt. Varje sådan gång kommer att representeras av en kant i E. Grafen är ej riktad, eftersom man teoretiskt sett kan gå fram och tillbaks mellan rutor i matrisen, även om det inte är särskilt smart. Varje hörn har en hörnkostnad som är den kostnad det tar att till hörnet från ett annat hörn.
 
-input till algoritmen: G = <V,E> , TL (lista med diken), s (hörnet som motsvarar M[0][0]), t (hörnet som motsvarar M[n][n]), en funktion weight(v) som returnerar ett heltal som är kostnaden för ett hörn.
+input till algoritmen: G = <V,E> , TL (lista med par av hörn med diken emellan), s (hörnet som motsvarar M[0][0]), e (hörnet som motsvarar M[n][n]), en funktion weight(v) som returnerar ett heltal som är kostnaden för ett hörn.
 
-LabyrintPath(G, TL, s, t):
-	dist[s] = 0 // sätt avstånd från s till s = 0
-	for each v in V:
-		dist[v] := inf // sätt avstånd from s till v till infinity
-		previous[v] := nil // markerar vilken hörn man kom ifrån 
-		unvisited <- add v // lägger till v i listan med hörn vi ej besökt.
+Dijkstras(G=<V,E>, TL, s ,e):
+
+	for each vertex v in V:										// initialisation
+		dist[v] = INF
+		previous[v] = NIL
+		add v to Queue
 	end for
+	dist[s] = 0													// distance from s -> s
 
-	while univisited is not empty:
-		u := vertex in unvisited, with lowest value in dist // 
-		
-		if dist[u] == inf
-			return impossible
+	while Unvisited is not empty:								// main loop
+		u := vertex in Queue with minimum distance in dist
+
+		if dist[u] == INF:
+			return "impossible"									// går ej att nå slutet
+		else if:
+			u == e:
+			return dist[u]										// vi är på sista hörnet
 		end if
 
-		remove u from unvisited
+		remove u from Queue										// Vi har nu besökt u
 
-		for each neighbor v of u:
-			if (u,v) in TL:
-				if dist[u] < 1000:
-					cost := weight(v) + 100
+		for each neighbor v of u:								// Gå igenom alla grannar till u	
+			if (u,v) in TL:										// Finns det ett dike mellan u och v?	
+				if dist[u] < 1000:								// Har vi inte ansträngt oss mer än 1000 enheter
+					cost := weight(v) + 1000					// sätt kostnad mellan u och v
 				else:
-					cost := inf
-				endif
-
+					cost := INF									// annars kan vi ej hoppa till v
+				end if
 			else:
-				cost := weight(v)
+				cost := weight(v)								// inget dike fanns
+			end if
 
-			endif
+			if cost == inf:
+				alt := cost
+			else:
+				alt:= dist[u] + cost
+			end if
 
-			alt := dist[i] + cost
-			if alt < dist[v]:
-				dist[v] := alt
-				previous[v] := u
+			// alt := dist[u] + cost								// dist för den alternativa vägen
+
+			if alt < dist[v]:									// om den alternativa vägen är mindre än förra	
+				dist[v] := alt 									// spara vägen
+				previous[v] := u 								// spara var vi kom ifrån
 			end if
 		end for
 	end while
 
-	return dist[t]
+	return dist[e]
 
-tidskomplexiteten för detta enkla fall av dijkstras algoritm är O(|V|²), där |V| = n*n, dvs. O(n^4)
+
+
+tidskomplexiteten för detta enkla fall av dijkstras algoritm (utan min_prio-kö) är O(|V|²), där |V| = n*n = n², dvs. O(n^4)
+|E| = 2n² - 2n = 2*(n² - n) = 2n*(n-1).
+
+Initialisering: Varje hörn gås igenom, dvs |V| gånger.
+Main loop: Unvisited kommer högst att gås igenom |V| gånger, dvs antalet hörn i grafen. Varje gång detta görs hittar man hörnet i Queue med minst avstånd: O(|V|). När man uppdaterar dist går man högst igenom varje kant i grafen, dvs |E|.
+
+eftersom |E| tillhör O(|V|^2),
+
+Tot: O(|V|² + |V| + |E|) = O(|V|²)
+
+
+|V| = n*n = 5*5 = 25
+|E| = 40
+
+* - * - * - * - *
+|   |   |   |	|
+* - * - * - * - *
+|   |   |   |	|
+* - * - * - * - *
+|   |   |   |	|
+* - * - * - * - *
+|   |   |   |	|
+* - * - * - * - *
+
+|V| = n*n = 4*4 = 16
+|E| = 24
+
+* - * - * - *
+|   |   |   |
+* - * - * - *
+|   |   |   |
+* - * - * - *
+|   |   |   |
+* - * - * - *
+
+|V| = n*n = 3*3 = 9
+|E| = 12
+
+* - * - *
+|   |   |
+* - * - *
+|   |   |
+* - * - *
+
+|V| = n*n = 2*2 = 4
+|E| = 4
+
+* - *
+|   |
+* - *
+
+(n-1)*n + (n-1) *n
+n²-n + n² -n
+2n² -2n
+
+
+2n^2 - 2n / n^2
+
+2- 2/

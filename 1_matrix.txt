@@ -1,0 +1,52 @@
+Dijkstras (M[n][n], TL):
+	
+	Queue(empty)
+	Visited[n][n]
+	Dist[n][n]
+
+	for each elem [i][j] in M:
+		Dist[i][j] := INF
+		Visited[i][j] := FALSE
+		Queue.insert [i][j], dist[i][j]
+	end for
+
+	Dist[0][0] := 0
+	Visited[0][0] := TRUE
+	Queue.insert [0][0], dist[0][0]
+
+	while Queue is not empty:
+		[i][j] := Q.extract_min // remove and retun best vertex
+		Visited[i][j] = TRUE
+
+		if i == n-1 AND j == n-1:
+			return dist[i][j]
+		if dist[i][j] == INF:
+			return "impossible"
+
+		visit_neighbor (i, j, i + 1, j  )
+		visit_neighbor (i, j, i - 1, j  )
+		visit_neighbor (i, j, i    , j + 1)
+		visit_neighbor (i, j, i    , j - 1)
+
+	return dist[n-1][n-1]
+
+
+visit_neighbor (oldi, oldj, i, j):
+	if i < 0 || i >= n || j < 0 || j >= n || Visited[i][j] == TRUE:
+		return
+
+	if ((i,j), (oldi, oldj)) in TL:
+		if dist[oldi][oldj] < 1000:
+			cost := M[i][j] + 100
+		else:
+			cost := INF
+	else:
+		cost := M[i][j]
+
+	alt := dist[oldi][oldj] + cost
+
+	if alt < dist[i][j]:
+		dist[i][j] := alt
+		Queue.decrease([i][j], alt)
+
+	
