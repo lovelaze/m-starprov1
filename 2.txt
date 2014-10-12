@@ -1,0 +1,94 @@
+Problemet är alltså att, givet en lista med lådor, returnera det maximala antal lådor som kan "nästlas" i varandra.
+
+Algoritmen itererar över boxes tills det inte finns några lådor kvar. Vi lägger första elementet i en lista kallad bigBoxes som kommer att hålla alla de största lådorna som inte går att stoppa i varandra (vi måste börja nån stans, därför stoppar vi in första, och antar att det kommer vara en av de stora lådorna). Sedan går vi igenom varje låda i boxes och jämför den med varje låda i bigBoxes. om lådan i boxes får plats i den i bigBoxes vet vi att den inte är en "bigBox", avbryter då loopen och kollar på nästa låda i boxes. om lådan i boxes är större än den i bigBoxes tar vi bort lådan i bigBoxes och lägger till den i boxes där istället, eftersom denna låda är större. Om lådorna vi jämför inte går in i varandra på något sätt kan vi direkt lägga till den ur boxes i bigBoxes, eftersom det är en ny "stor" låda.
+
+när vi har itererat igenom de två looparna minskar vi boxes med innehållet i bigBoxes, detta görs istället med en ny lista restBoxes som sätts lika med boxes, för att slippa utföra operationen boxes := boxes - bigBoxes (som har dålig tidskomplexitet). Genom att räkna antalet iterationer som while-slingan körs vet vi hur många lådor vi som mest kan stoppa i varandra.
+
+Detta fungerar eftersom när första for-slingan körts klart, kommer bigBoxes innehålla alla de största lådorna som inte går att stoppa i varandra, och vi 
+
+
+
+en lista bigBoxes skapas i början på algoritmen. I denna samlas i varje iteration alla de största lådor som inte kan stoppas i varandra.
+
+komplexitet:
+while-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
+första for-loopen loopar över alla lådor i boxlist, som i värsta fall körs n gånger.
+sita for-loopen kommer i värsta fall köras n gånger, om boxlist innehåller boxar där ingen går att stacka i varandra.
+
+input: en lista med lådor som har höjd, bredd och djup
+
+nestBoxes(boxes[n]):
+	bigBoxes[]
+
+	amount := 0
+	while boxes is not empty: // while boxes is not empty
+		bigBoxes.add(boxes[1])
+		restBoxes[]
+
+		for i <- 1 to length(boxes):	// for every box in boxes
+			INV: every box in bigBoxes does not fit in boxes[1 .. i-1]
+
+			big := true
+			for j <- 1 to length(bigBoxes): // for every bigBox in bigBoxes
+				INV: boxes[i] does not fit in bigBoxes[1 .. j-1]
+
+				if boxes[i] != bigBoxes[j]:
+					if boxes[i] fits bigBoxes[j]: // if box is smaller than bigBox
+						big := false	// will not add box to bigBoxes
+						break			// break loop since a smaller box was found
+
+					else if bigBoxes[j] fits boxes[i]:	// bigBox is smaller than box
+						bigBoxList.remove(bigBoxes[j])	// since bigBox is no longer the biggest, remove
+						restBoxes.add(bigBoxes[j])
+					end if
+				end if
+
+			end for
+
+			if big && boxes[i] not in bigBoxes: // we found a new bigBox, add it to bigBoxes
+				bigBoxes.add(boxes[i])
+			else:
+				restBoxes.add(boxes[i])
+
+		end for
+		boxes := restBoxes
+		bigBoxes.clear		// reset
+		counter += 1		// result
+	end while
+
+	return amount
+
+fits(b1, b2):
+	return (b1.min < b2.min and
+		   b1.med < b2.med and
+		   b1.max < b2.max)
+
+////////////////////////////////////////////////////////////
+
+nestBoxes(boxlist[n]):
+	bigBoxList[]
+
+	amount := 0
+	while boxlist is not empty: // while boxlist is not empty
+		bigBoxList.add(boxlist[0])
+		for each box in boxlist:	// for every box in boxlist
+
+			big := true
+			for each bigBox in bigBoxList: // for every bigBox in bigBoxList
+				if box fits bigBox: // if box is smaller than bigBox
+					big := false	// will not add box to bigBoxList
+					break			// break loop since a smaller box was found
+
+				else if bigBox fits box:	// bigBoxList is smaller than box
+					bigBoxList.remove(bigBox)	// since bigBox is no longer the biggest, remove
+				end if
+			end for
+
+			if big && box not in bigBoxList: // we found a new bigger box, add it to bigBoxList
+				bigBoxList add box
+
+		end for
+		boxlist := boxlist - bigBoxList	// iterate
+		bigBoxList.clear	// reset
+		counter += 1		// result
+	end while

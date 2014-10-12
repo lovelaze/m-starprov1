@@ -16,8 +16,7 @@ Dijkstras(G=<V,E>, TL, s ,e):
 
 		if dist[u] == INF:
 			return "impossible"									// går ej att nå slutet
-		else if:
-			u == e:
+		else if u == e:
 			return dist[u]										// vi är på sista hörnet
 		end if
 
@@ -26,7 +25,7 @@ Dijkstras(G=<V,E>, TL, s ,e):
 		for each neighbor v of u:								// Gå igenom alla grannar till u	
 			if (u,v) in TL:										// Finns det ett dike mellan u och v?	
 				if dist[u] < 1000:								// Har vi inte ansträngt oss mer än 1000 enheter
-					cost := weight(v) + 1000					// sätt kostnad mellan u och v
+					cost := weight(v) + 100					// sätt kostnad mellan u och v
 				else:
 					cost := INF									// annars kan vi ej hoppa till v
 				end if

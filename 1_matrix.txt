@@ -1,38 +1,63 @@
+Jag har valt att modifiera Djikstra's grafalgoritm för att hitta den kortaste stigen från två hörn i en graf. Detta fungerar att modifiera eftersom labyrinten (matrisen) går att tolka som en graf där varje ruta i matrisen är ett hörn och antalet hörn |V| = n*n, dvs. matrisens storlek och antalet kanter|E| = 2n*(n-1). En prioritetskö (min-heap) används för att snabbt gå vidare från ett hörn till dess närmsta granne.
+
+input till algoritmen: en matris M[n][n] och en lista TL med diken som är m element stor.
+
+|V| = n*n = n², dvs. O(n^4)
+|E| = 2n² - 2n = 2*(n² - n) = 2n*(n-1).
+
+komplexitet:
+initialize: vi går igenom hela matrisen, dvs. n*n gånger. I varje iteration görs två konstanta operationer och en insättning i prioritetskön (tar O(log n)). Komplexiteten blir därför O(n²log n).
+
+main loop:
+	while : i värsta fall alla hörn: O(|V|) = O(n²). kan returnera tidigare om vi hittar en "snabb" väg.
+	varje iteration i while kommer hämta ut ett hörn ur kön. eftersom kön kan innehålla |V| hörn, om använder vi en min-heap (prioritetskö) kommer varje hämtning ur kön ta O(log |V|) = O(log n²) = O(2*log n) = O(log n) (eftersom vi måste "filtrera" om trädet sen)
+
+	vi kommer alltid att kolla om vi kan gå till fyra granner för hörnet vi står på. i värsta fall kommer vi kunna det och då körs visit_neighbor 4 gånger. I varje iteration kommer vi i värsta fall leta igenom hela listan med diken: det tar O(m) tid och i värsta fall behöver vi minska prioriteten hos ett hörn i kön eftersom vi hittat en snabbare väg till ett hörn. Det tar O(4*log |V|) = O(log n²) =  O(2*log n) = O(log n)
+
+totalt: init + main = O(n²log n + n² * log n * m * log n) = O(n²log n + mn²*log n) = O(m*n²*log n²)
+
 Dijkstras (M[n][n], TL):
 	
 	Queue(empty)
 	Visited[n][n]
 	Dist[n][n]
 
-	for each elem [i][j] in M:
-		Dist[i][j] := INF
-		Visited[i][j] := FALSE
-		Queue.insert [i][j], dist[i][j]
+	Dist[1][1] := M[1][1]
+	Visited[1][1] := TRUE
+	Queue.insert_with_priority [1][1], dist[1][1]
+
+	for i in 1 .. n:
+		for j in 1 .. n:
+		if [i][j] != [1][1]:
+			Dist[i][j] := INF
+			Visited[i][j] := FALSE
+			Queue.insert_with_priority [i][j], dist[i][j]
+		end if
+		end for
 	end for
 
-	Dist[0][0] := 0
-	Visited[0][0] := TRUE
-	Queue.insert [0][0], dist[0][0]
-
-	while Queue is not empty:
-		[i][j] := Q.extract_min // remove and retun best vertex
+	while Queue is not empty:		// main loop
+		(i,j) := Queue.extract_min // remove and return best vertex
 		Visited[i][j] = TRUE
 
-		if i == n-1 AND j == n-1:
-			return dist[i][j]
 		if dist[i][j] == INF:
 			return "impossible"
-
+		end if
+		if i == n AND j == n:
+			return dist[i][j]
+		end if
+		
 		visit_neighbor (i, j, i + 1, j  )
 		visit_neighbor (i, j, i - 1, j  )
 		visit_neighbor (i, j, i    , j + 1)
 		visit_neighbor (i, j, i    , j - 1)
 
-	return dist[n-1][n-1]
+	end while
+	return dist[n][n]
 
 
 visit_neighbor (oldi, oldj, i, j):
-	if i < 0 || i >= n || j < 0 || j >= n || Visited[i][j] == TRUE:
+	if i < 1 or i >= n+1 or j < 1 or j >= n+1 or Visited[i][j] == TRUE:
 		return
 
 	if ((i,j), (oldi, oldj)) in TL:
@@ -47,6 +72,7 @@ visit_neighbor (oldi, oldj, i, j):
 
 	if alt < dist[i][j]:
 		dist[i][j] := alt
-		Queue.decrease([i][j], alt)
+		Queue.decrease_priority([i][j], alt)
 
 	
+
