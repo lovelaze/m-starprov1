@@ -14,20 +14,20 @@ main loop:
 
 	vi kommer alltid att kolla om vi kan gå till fyra granner för hörnet vi står på. i värsta fall kommer vi kunna det och då körs visit_neighbor 4 gånger. I varje iteration kommer vi i värsta fall leta igenom hela listan med diken: det tar O(m) tid och i värsta fall behöver vi minska prioriteten hos ett hörn i kön eftersom vi hittat en snabbare väg till ett hörn. Det tar O(4*log |V|) = O(log n²) =  O(2*log n) = O(log n)
 
-totalt: init + main = O(n²log n + n² * log n * m * log n) = O(n²log n + mn²*log n) = O(m*n²*log n²)
+totalt: init + main = O(n²log n + n² * log n * m * log n) = O(n²log n + mn²*log n) = O(m*n²*(log n)²)
 
-Dijkstras (M[n][n], TL):
+Dijkstras (M[1..n][1..n], TL[1..m]):
 	
 	Queue(empty)
-	Visited[n][n]
-	Dist[n][n]
+	Visited[1..n][1..n]
+	Dist[1..n][1..n]
 
 	Dist[1][1] := M[1][1]
 	Visited[1][1] := TRUE
 	Queue.insert_with_priority [1][1], dist[1][1]
 
-	for i in 1 .. n:
-		for j in 1 .. n:
+	for i <- 1 to n:
+		for j <- 1 to n:
 		if [i][j] != [1][1]:
 			Dist[i][j] := INF
 			Visited[i][j] := FALSE

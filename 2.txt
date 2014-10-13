@@ -4,24 +4,20 @@ Algoritmen itererar över boxes tills det inte finns några lådor kvar. Vi läg
 
 när vi har itererat igenom de två looparna minskar vi boxes med innehållet i bigBoxes, detta görs istället med en ny lista restBoxes som sätts lika med boxes, för att slippa utföra operationen boxes := boxes - bigBoxes (som har dålig tidskomplexitet). Genom att räkna antalet iterationer som while-slingan körs vet vi hur många lådor vi som mest kan stoppa i varandra.
 
-Detta fungerar eftersom när första for-slingan körts klart, kommer bigBoxes innehålla alla de största lådorna som inte går att stoppa i varandra, och vi 
-
-
+Detta fungerar eftersom när första for-slingan körts klart, kommer bigBoxes innehålla alla de största lådorna som inte går att stoppa i varandra, och vi vet då att någon av lådorna i boxes går att stoppa i någon av lådorna i bigBoxes, vilket betyder att vi kan öka amount med ett. Detta gäller i varje iteration i while-slingan. Det spelar ingen roll vilken av lådorna i boxes vi kan stoppa i en annan, eftersom det enda vi är ute efter är det maximala antalet lådor som går att nästla i varandra. Så länge vi vet att NÅGON kan stoppas i en annan, kan vi öka amount med 1.
 
 en lista bigBoxes skapas i början på algoritmen. I denna samlas i varje iteration alla de största lådor som inte kan stoppas i varandra.
 
-komplexitet:
-while-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
-första for-loopen loopar över alla lådor i boxlist, som i värsta fall körs n gånger.
-sita for-loopen kommer i värsta fall köras n gånger, om boxlist innehåller boxar där ingen går att stacka i varandra.
+
 
 input: en lista med lådor som har höjd, bredd och djup
 
-nestBoxes(boxes[n]):
+nestBoxes(boxes[1..n]):
 	bigBoxes[]
 
 	amount := 0
 	while boxes is not empty: // while boxes is not empty
+		INV: length(boxes) > 0 (OBVIOUS)
 		bigBoxes.add(boxes[1])
 		restBoxes[]
 
@@ -62,6 +58,14 @@ fits(b1, b2):
 	return (b1.min < b2.min and
 		   b1.med < b2.med and
 		   b1.max < b2.max)
+
+////////////////////////////////////////////////////////////
+
+komplexitet:
+while-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
+första for-loopen loopar över alla lådor i boxes, som i värsta fall körs n gånger.
+sista for-loopen kommer i värsta fall köras n gånger, om boxes innehåller boxar där ingen går att stoppa i varandra.
+
 
 ////////////////////////////////////////////////////////////
 
