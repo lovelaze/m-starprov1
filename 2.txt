@@ -1,13 +1,16 @@
-Problemet är alltså att, givet en lista med lådor, returnera det maximala antal lådor som kan "nästlas" i varandra.
+Problemet är alltså att, givet en lista med lådor, returnera det maximala antal lådor som kan "nästlas" i varandra. Det går att lösa på olika sätt, jag valde följande lösning:
 
-Algoritmen itererar över boxes tills det inte finns några lådor kvar. Vi lägger första elementet i en lista kallad bigBoxes som kommer att hålla alla de största lådorna som inte går att stoppa i varandra (vi måste börja nån stans, därför stoppar vi in första, och antar att det kommer vara en av de stora lådorna). Sedan går vi igenom varje låda i boxes och jämför den med varje låda i bigBoxes. om lådan i boxes får plats i den i bigBoxes vet vi att den inte är en "bigBox", avbryter då loopen och kollar på nästa låda i boxes. om lådan i boxes är större än den i bigBoxes tar vi bort lådan i bigBoxes och lägger till den i boxes där istället, eftersom denna låda är större. Om lådorna vi jämför inte går in i varandra på något sätt kan vi direkt lägga till den ur boxes i bigBoxes, eftersom det är en ny "stor" låda.
+De kan först vara värt att notera att en låda b1 endast kan stoppas i en annan låda b2 om den minsta dimensionen för b1 är mindre än den minsta för b2, den mellersta dimensionen för b1 är mindre än den mellersta dimensionen för b2 och den största dimensionen för b1 är mindre än b2. Gäller detta betyder det att vi kan vrida på låda b1 på något sätt (om det behövs) så att den får plats i b2. 
 
-när vi har itererat igenom de två looparna minskar vi boxes med innehållet i bigBoxes, detta görs istället med en ny lista restBoxes som sätts lika med boxes, för att slippa utföra operationen boxes := boxes - bigBoxes (som har dålig tidskomplexitet). Genom att räkna antalet iterationer som while-slingan körs vet vi hur många lådor vi som mest kan stoppa i varandra.
+Algoritmen itererar över listan med lådor (boxes) tills det inte finns några lådor kvar. Vi lägger första elementet i en lista kallad unNestables som kommer att hålla alla de största lådorna som inte går att stoppa i varandra (vi måste börja nån stans, därför stoppar vi in just den första, och antar att det kommer vara en stor låda). Sedan går vi igenom varje låda i boxes och jämför den med varje låda i unNestables. Om lådan i boxes får plats i den i unNestables vet vi att den inte är en "stor" låda avbryter då loopen och kollar på nästa låda i boxes (i+1). 
 
-Detta fungerar eftersom när första for-slingan körts klart, kommer bigBoxes innehålla alla de största lådorna som inte går att stoppa i varandra, och vi vet då att någon av lådorna i boxes går att stoppa i någon av lådorna i bigBoxes, vilket betyder att vi kan öka amount med ett. Detta gäller i varje iteration i while-slingan. Det spelar ingen roll vilken av lådorna i boxes vi kan stoppa i en annan, eftersom det enda vi är ute efter är det maximala antalet lådor som går att nästla i varandra. Så länge vi vet att NÅGON kan stoppas i en annan, kan vi öka amount med 1.
+Om lådan i boxes är större än den i unNestables tar vi bort lådan i unNestables och lägger till den från boxes istället, eftersom vi har hittade en större låda, och den gamla i unNestables är då inte längre "störst".
 
+Om lådan i boxes inte går att stopppa in i någon av boxarn i unNestables pånågot sätt kan vi lägga till i unNestables, eftersom vi har hittat är en ny "stor" låda som inte går att "nästla".
 
-input: en lista med lådor som har höjd, bredd och djup
+När vi har itererat igenom de två for-looparna minskar vi boxes med innehållet i unNestables, detta görs istället med en ny lista restBoxes som sätts lika med boxes, för att slippa utföra operationen boxes := boxes - unNestables (som skulle ta lång tid att utföra eftersom vi då måste gå ingeom alla element i boxes och jämföra). Genom att räkna antalet iterationer som while-slingan körs vet vi hur många lådor vi som mest kan stoppa i varandra.
+
+Indata: en lista med lådor som har höjd, bredd och djup
 
 nestBoxes(boxes[1..n]):
 	bigBoxes[]
@@ -23,7 +26,7 @@ nestBoxes(boxes[1..n]):
 
 			big := true
 			for j <- 1 to length(bigBoxes): // for every bigBox in bigBoxes
-				INV: boxes[i] does not fit in bigBoxes[1 .. j-1]
+				INV: boxes[i] does not fit in bigBoxes[1 .. j-1] and bigBoxes[1 .. j-1] does not fit in boxes[i]
 
 				if boxes[i] != bigBoxes[j]:
 					if boxes[i] fits bigBoxes[j]: // if box is smaller than bigBox
@@ -38,7 +41,7 @@ nestBoxes(boxes[1..n]):
 
 			end for
 
-			if big && boxes[i] not in bigBoxes: // we found a new bigBox, add it to bigBoxes
+			if big: // we found a new bigBox, add it to bigBoxes
 				bigBoxes.add(boxes[i])
 			else:
 				restBoxes.add(boxes[i])
@@ -58,40 +61,13 @@ fits(b1, b2):
 
 ////////////////////////////////////////////////////////////
 
-komplexitet:
-while-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
-första for-loopen loopar över alla lådor i boxes, som i värsta fall körs n gånger.
-sista for-loopen kommer i värsta fall köras n gånger, om boxes innehåller boxar där ingen går att stoppa i varandra.
+Detta fungerar eftersom när första for-slingan körts klart, kommer unNestables innehålla alla de största lådorna som inte går att stoppa i varandra, och vi vet då att någon av lådorna i boxes går att stoppa i någon av lådorna i unNestables, vilket betyder att vi kan nästla en låda i en annan och därmed öka amount med ett. Detta gäller i varje iteration i while-slingan, eftersom pga invarianterna i for-looparna, som hänvisas till algoritmförklaringen ovan. Det spelar ingen roll vilken av lådorna i boxes vi kan stoppa i en annan ur unNestables. Eftersom det enda vi är ute efter är det maximala antalet lådor som går att nästla i varandra, så räcker det med att veta att någon kan stoppas i, då kan vi öka amount med ett.
+Så länge vi vet att NÅGON kan stoppas i en annan, kan vi öka amount med 1.
 
-Algoritmen är korrekt eftersom...
+Komplexitet:
+While-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
+Den innersta for-loopen loopar över alla lådor i boxes, som i värsta fall körs n gånger.
+Den sista for-loopen kommer i värsta fall köras n gånger, om boxes innehåller boxar där ingen går att stoppa i varandra.
+Funktionen fits tar konstant tid eftersom vi alltid har en låda med tre dimensioner och alla andra operationer i algoritmen är konstanta (insättning och borttagning av element i listorna).
 
-
-////////////////////////////////////////////////////////////
-
-nestBoxes(boxlist[n]):
-	bigBoxList[]
-
-	amount := 0
-	while boxlist is not empty: // while boxlist is not empty
-		bigBoxList.add(boxlist[0])
-		for each box in boxlist:	// for every box in boxlist
-
-			big := true
-			for each bigBox in bigBoxList: // for every bigBox in bigBoxList
-				if box fits bigBox: // if box is smaller than bigBox
-					big := false	// will not add box to bigBoxList
-					break			// break loop since a smaller box was found
-
-				else if bigBox fits box:	// bigBoxList is smaller than box
-					bigBoxList.remove(bigBox)	// since bigBox is no longer the biggest, remove
-				end if
-			end for
-
-			if big && box not in bigBoxList: // we found a new bigger box, add it to bigBoxList
-				bigBoxList add box
-
-		end for
-		boxlist := boxlist - bigBoxList	// iterate
-		bigBoxList.clear	// reset
-		counter += 1		// result
-	end while
+Vi har då tre stycken nästlade loopar som i värsta fall körs n iterationer var, därför blir tidskomplexiteten O(N^3);

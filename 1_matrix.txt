@@ -1,25 +1,18 @@
 Jag har valt att modifiera Djikstra's grafalgoritm för att hitta den kortaste stigen från två hörn i en graf. Detta fungerar att modifiera eftersom labyrinten (matrisen) går att tolka som en graf där varje ruta i matrisen är ett hörn och antalet hörn |V| = n*n, dvs. matrisens storlek och antalet kanter|E| = 2n*(n-1). Varje hörn kan maximalt ha fyra kanter, dvs till dess närliggande rutor i matrisem. En prioritetskö (min-heap) används för att snabbt gå vidare från ett hörn till dess närmsta granne.
 
-
-
-input till algoritmen: en matris M[n][n] och en lista TL med diken som är m element stor.
-
 |V| = n*n = n², dvs. O(n^4)
 |E| = 2n² - 2n = 2*(n² - n) = 2n*(n-1).
 
-komplexitet:
-initialize: vi går igenom hela matrisen, dvs. n*n gånger. I varje iteration görs två konstanta operationer och en insättning i prioritetskön (tar O(log n)). Komplexiteten blir därför O(n²log n).
+Algoritmen fungerar principiellt likadant som Dijsktra's. I början på algoritmen initieras en prioritetskö Queue, där de "billigaste" hörnen sedan hämtas ifrån, en matris Visited som sparar de hörnen vi redan har besökt och en matris Dist som sparar de kortaste avstånden vi hittat till hörnen.
+Först initialiseras allt genom att man för alla hörn (förutom starthörnet) i labyrinten sätter Dist till INF (infinity) och Visited till FALSE, samt lägger in hörnet i prioritetskön. Starthörnet blir första gången det hörnet med högst prioritet och har avståndet det tar att gå in i labyrinten (dvs. dess hörnvikt).
+Sedan körs huvudloopen, där man alltid hämtar ut det hörn med högst prioritet ur kön (dvs. det med minst avstånd). Här är algoritmen modifierad så att om hörnet vi hämtat har dist = INF vet vi att vi inte kan nå längre, eftersom det är hörnet med högst prioritet och returnerar. Om vi är på hörnet längst ner till höger i matrisen, dvs utgången, returnerar vi dess avstånd och är klara.
+För varje hörn kommer vi gå igenom alla grannar (som vi vet max kommer att vara fyra stycken), detta görs med en hjälpmetod visit_neighbor som körs fyra gånger. Det är egentligen här algoritmen är mest modifierad. Först måste vi kolla om grannen tillhör matrisen eller om vi redan har besökt den. Gör den det måste vi också kolla om det finns ett dike till grannen och kolla om vi kan hoppa över det, eller om vi måste gå runt det. Om vi på detta vis hittar en ny kortare väg till grannen uppdaterar vi dess avstånd i Dist och ändra dess prioritet i prioritetskön.
 
-main loop:
-	while : i värsta fall alla hörn: O(|V|) = O(n²). kan returnera tidigare om vi hittar en "snabb" väg.
-	varje iteration i while kommer hämta ut ett hörn ur kön. eftersom kön kan innehålla |V| hörn, om använder vi en min-heap (prioritetskö) kommer varje hämtning ur kön ta O(log |V|) = O(log n²) = O(2*log n) = O(log n) (eftersom vi måste "filtrera" om trädet sen)
+Indata till algoritmen: en matris M[][] som är n*n element stor och en lista TL med diken som är l element stor.
 
-	vi kommer alltid att kolla om vi kan gå till fyra granner för hörnet vi står på. i värsta fall kommer vi kunna det och då körs visit_neighbor 4 gånger. I varje iteration kommer vi i värsta fall leta igenom hela listan med diken: det tar O(m) tid och i värsta fall behöver vi minska prioriteten hos ett hörn i kön eftersom vi hittat en snabbare väg till ett hörn. Det tar O(4*log |V|) = O(log n²) =  O(2*log n) = O(log n)
-
-totalt: init + main = O(n²log n + n² * log n * m * log n) = O(n²log n + mn²*log n) = O(m*n²*(log n)²)
-
-Dijkstras (M[1..n][1..n], TL[1..m]):
+Dijkstras (M[1..n][1..n], TL[1..l]):
 	
+	// initialisering
 	Queue(empty)
 	Visited[1..n][1..n]
 	Dist[1..n][1..n]
@@ -38,8 +31,9 @@ Dijkstras (M[1..n][1..n], TL[1..m]):
 		end for
 	end for
 
-	while Queue is not empty:		// main loop
-		(i,j) <- Queue.extract_min // remove and return best vertex
+	// huvudloop
+	while Queue is not empty:
+		(i,j) <- Queue.extract_min 
 		Visited[i][j] <- TRUE
 
 		if dist[i][j] == INF:
@@ -70,11 +64,25 @@ visit_neighbor (oldi, oldj, i, j):
 	else:
 		cost <- M[i][j]
 
-	alt <- dist[oldi][oldj] + cost
+	if cost != INF:
+		alt <- cost + dist[oldi][oldj]
+	else:
+		alt <- cost
 
-	if alt < dist[i][j]:
-		dist[i][j] <- alt
+	//alt <- Dist[oldi][oldj] + cost
+
+	if alt < Dist[i][j]:
+		Dist[i][j] <- alt
 		Queue.decrease_priority( (i,j), alt )
 
 	
+Tidskomplexitet:
+	initialisering: vi går igenom hela matrisen, dvs. n*n gånger. I varje iteration görs två konstanta operationer och en insättning i prioritetskön (tar O(log n)). Komplexiteten för initialiseringen blir därför O(n²log n).
+
+	huvudloop:
+	while : i värsta fall går vi igenom alla hörn: O(|V|) = O(n²), kan returnera tidigare om vi hittar en "snabb" väg. Varje iteration i while kommer hämta ut ett hörn ur kön. eftersom kön kan innehålla |V| hörn, och om använder vi en min-heap (prioritetskö) kommer varje hämtning ur kön ta O(log |V|) = O(log n²) = O(2*log n) = O(log n) (eftersom vi måste "filtrera" om trädet sen)
+	Vi kommer alltid att kolla om vi kan gå till fyra granner för hörnet vi står på. i värsta fall kommer vi kunna det och då körs hela visit_neighbor 4 gånger. I varje sådan iteration kommer vi i värsta fall leta igenom hela listan med diken: det tar O(l) tid och i värsta fall behöver vi minska prioriteten hos ett hörn i kön eftersom vi hittat en snabbare väg till ett hörn. Det tar O(4*log |V|) = O(log n²) =  O(2*log n) = O(log n)
+
+totalt: init + huvud = O(n²log n + n² * log n * m * log n) = O(n²log n + mn²*log n) = O(l*n²*(log n)²)
+
 
