@@ -1,4 +1,6 @@
-Jag har valt att modifiera Djikstra's grafalgoritm för att hitta den kortaste stigen från två hörn i en graf. Detta fungerar att modifiera eftersom labyrinten (matrisen) går att tolka som en graf där varje ruta i matrisen är ett hörn och antalet hörn |V| = n*n, dvs. matrisens storlek och antalet kanter|E| = 2n*(n-1). En prioritetskö (min-heap) används för att snabbt gå vidare från ett hörn till dess närmsta granne.
+Jag har valt att modifiera Djikstra's grafalgoritm för att hitta den kortaste stigen från två hörn i en graf. Detta fungerar att modifiera eftersom labyrinten (matrisen) går att tolka som en graf där varje ruta i matrisen är ett hörn och antalet hörn |V| = n*n, dvs. matrisens storlek och antalet kanter|E| = 2n*(n-1). Varje hörn kan maximalt ha fyra kanter, dvs till dess närliggande rutor i matrisem. En prioritetskö (min-heap) används för att snabbt gå vidare från ett hörn till dess närmsta granne.
+
+
 
 input till algoritmen: en matris M[n][n] och en lista TL med diken som är m element stor.
 
@@ -22,23 +24,23 @@ Dijkstras (M[1..n][1..n], TL[1..m]):
 	Visited[1..n][1..n]
 	Dist[1..n][1..n]
 
-	Dist[1][1] := M[1][1]
-	Visited[1][1] := TRUE
-	Queue.insert_with_priority [1][1], dist[1][1]
+	Dist[1][1] <- M[1][1]
+	Visited[1][1] <- TRUE
+	Queue.insert_with_priority( (1,1), dist[1][1] )
 
 	for i <- 1 to n:
 		for j <- 1 to n:
 		if [i][j] != [1][1]:
-			Dist[i][j] := INF
-			Visited[i][j] := FALSE
-			Queue.insert_with_priority [i][j], dist[i][j]
+			Dist[i][j] <- INF
+			Visited[i][j] <- FALSE
+			Queue.insert_with_priority( (i,j), dist[i][j] )
 		end if
 		end for
 	end for
 
 	while Queue is not empty:		// main loop
-		(i,j) := Queue.extract_min // remove and return best vertex
-		Visited[i][j] = TRUE
+		(i,j) <- Queue.extract_min // remove and return best vertex
+		Visited[i][j] <- TRUE
 
 		if dist[i][j] == INF:
 			return "impossible"
@@ -62,17 +64,17 @@ visit_neighbor (oldi, oldj, i, j):
 
 	if ((i,j), (oldi, oldj)) in TL:
 		if dist[oldi][oldj] < 1000:
-			cost := M[i][j] + 100
+			cost <- M[i][j] + 100
 		else:
-			cost := INF
+			cost <- INF
 	else:
-		cost := M[i][j]
+		cost <- M[i][j]
 
-	alt := dist[oldi][oldj] + cost
+	alt <- dist[oldi][oldj] + cost
 
 	if alt < dist[i][j]:
-		dist[i][j] := alt
-		Queue.decrease_priority([i][j], alt)
+		dist[i][j] <- alt
+		Queue.decrease_priority( (i,j), alt )
 
 	
 

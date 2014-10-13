@@ -6,9 +6,6 @@ när vi har itererat igenom de två looparna minskar vi boxes med innehållet i 
 
 Detta fungerar eftersom när första for-slingan körts klart, kommer bigBoxes innehålla alla de största lådorna som inte går att stoppa i varandra, och vi vet då att någon av lådorna i boxes går att stoppa i någon av lådorna i bigBoxes, vilket betyder att vi kan öka amount med ett. Detta gäller i varje iteration i while-slingan. Det spelar ingen roll vilken av lådorna i boxes vi kan stoppa i en annan, eftersom det enda vi är ute efter är det maximala antalet lådor som går att nästla i varandra. Så länge vi vet att NÅGON kan stoppas i en annan, kan vi öka amount med 1.
 
-en lista bigBoxes skapas i början på algoritmen. I denna samlas i varje iteration alla de största lådor som inte kan stoppas i varandra.
-
-
 
 input: en lista med lådor som har höjd, bredd och djup
 
@@ -34,7 +31,7 @@ nestBoxes(boxes[1..n]):
 						break			// break loop since a smaller box was found
 
 					else if bigBoxes[j] fits boxes[i]:	// bigBox is smaller than box
-						bigBoxList.remove(bigBoxes[j])	// since bigBox is no longer the biggest, remove
+						bigBoxes.remove(bigBoxes[j])	// since bigBox is no longer the biggest, remove
 						restBoxes.add(bigBoxes[j])
 					end if
 				end if
@@ -65,6 +62,8 @@ komplexitet:
 while-loopen kommer i värsta fall köras n iterationer, dvs om alla boxar kan nästlas inuti varandra.
 första for-loopen loopar över alla lådor i boxes, som i värsta fall körs n gånger.
 sista for-loopen kommer i värsta fall köras n gånger, om boxes innehåller boxar där ingen går att stoppa i varandra.
+
+Algoritmen är korrekt eftersom...
 
 
 ////////////////////////////////////////////////////////////
